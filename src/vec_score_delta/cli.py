@@ -11,10 +11,10 @@ from .specs import DIAGNOSTIC_METRICS
 def _metrics(path: Path) -> dict:
     payload = json.loads(path.read_text(encoding="utf-8"))
     if not isinstance(payload, dict):
-        raise ValueError(f"{path} must contain a JSON object")
+        raise TypeError(f"{path} must contain a JSON object")
     metrics = payload.get("metrics", payload)
     if not isinstance(metrics, dict):
-        raise ValueError(f"{path}: metrics must be a JSON object")
+        raise TypeError(f"{path}: metrics must be a JSON object")
     return metrics
 
 
@@ -31,7 +31,7 @@ def main(argv: list[str] | None = None) -> int:
         old_metrics = _metrics(args.old)
         new_metrics = _metrics(args.new)
         result = compare(old_metrics, new_metrics, args.task, args.board)
-    except (OSError, ValueError, json.JSONDecodeError) as exc:
+    except (OSError, ValueError, TypeError, json.JSONDecodeError) as exc:
         print(f"ERROR: {exc}")
         return 2
 
